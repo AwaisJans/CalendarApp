@@ -8,15 +8,75 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_margin="7dp"
         android:background="#B49F9898"
         android:padding="20sp"
+        android:gravity="center"
         android:id="@+id/idAdd"
+        android:visibility="gone"
+        android:textStyle="bold"
         android:layout_height="wrap_content"
         android:text="Add to Calendar"
         android:textSize="30sp"
         android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_margin="7dp"
+        android:background="#B49F9898"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:padding="20sp"
+        android:gravity="center"
+        android:id="@+id/idmainAct2"
+        android:layout_height="wrap_content"
+        android:text="MainActivity2"
+        android:textSize="30sp"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_margin="7dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="#B49F9898"
+        android:padding="20sp"
+        android:id="@+id/idCalApi"
+        android:layout_height="wrap_content"
+        android:text="Add Using Calendar Api"
+        android:textSize="30sp"
+        android:textColor="@color/black" />
+
+
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_margin="7dp"
+        android:visibility="gone"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:background="#B49F9898"
+            android:visibility="gone"
+            android:padding="20sp"
+            android:id="@+id/tvCalendarList"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/black" />
+
+
+    </ScrollView>
+
+
+
+
+
+
 
 </LinearLayout>
