@@ -1,35 +1,12 @@
 package com.jans.calendar.event.app
 
-import android.annotation.SuppressLint
-import android.content.ContentResolver
-import android.content.ContentUris
-import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Bundle
-import android.provider.CalendarContract.Calendars
-import android.provider.CalendarContract.Events
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.RuntimeExecutionException
 import com.jans.calendar.event.app.api.CalendarApiScreen
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import java.util.Calendar
-import java.util.Calendar.JANUARY
-import java.util.TimeZone
 
 
 class MainActivity : AppCompatActivity() {
@@ -45,14 +22,24 @@ class MainActivity : AppCompatActivity() {
 
 
         btnCalApiScreen.setOnClickListener {
-            val intentScreen = Intent(this, CalendarApiScreen::class.java)
-            startActivity(intentScreen)
+            if(isNetworkAvailable()){
+                val intentScreen = Intent(this, CalendarApiScreen::class.java)
+                startActivity(intentScreen)
+            }
+            else{
+                Toast.makeText(this@MainActivity, "No Internet Connection", Toast.LENGTH_SHORT).show()
+            }
+
 
         }
 
     }
 
-
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager?.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
 
 
 
