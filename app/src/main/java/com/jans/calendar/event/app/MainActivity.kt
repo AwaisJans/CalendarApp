@@ -1,7 +1,9 @@
 package com.jans.calendar.event.app
 
 import android.Manifest
+import android.accounts.AccountManager
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
@@ -9,11 +11,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Calendars
 import android.provider.CalendarContract.Events
 import android.util.Log
+import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.jans.calendar.event.app.api.CalendarApiScreen
 import com.jans.calendar.event.app.databinding.ActivityMainBinding
@@ -51,19 +58,19 @@ class MainActivity : AppCompatActivity() {
 
 // get the event ID that is the last element in the Uri
 
-//            val calWriter = CalendarWriter(this@MainActivity)
-//            val calendars = calWriter.getCalendars()
-//            val calendarIds = mutableListOf<Long>()
-//            for (calendar in calendars) {
-//                Log.d("how123", calendar.accountName.toString())
-//
-//                calendarIds.add(calendar.calendarId)
-//            }
+            val calWriter = CalendarWriter(this@MainActivity)
+            val calendars = calWriter.getCalendars()
+            val calendarIds = mutableListOf<Long>()
+            for (calendar in calendars) {
+                Log.d("how123", calendar.accountName.toString())
 
-            startActivity(Intent(this, CalendarApiScreen::class.java))
+                calendarIds.add(calendar.calendarId)
+            }
 
-//            val num = (0 until calendarIds.size).random()
-//            calWriter.addEvents(calendarIds[num], eventList())
+//            startActivity(Intent(this, CalendarApiScreen::class.java))
+
+            val num = (0 until calendarIds.size).random()
+            calWriter.addEvents(calendarIds[num], eventList())
         }
 
     }
@@ -143,16 +150,84 @@ class MainActivity : AppCompatActivity() {
                     ContentUris.withAppendedId(Events.CONTENT_URI, calendarId), values, null, null
                 )
 
-
-
                 results.add(eventAdded)
 
-                if (eventAdded) {
-                    showToast("Event added successfully: ${event.title}")
-                } else {
-                    showToast("Failed to add event: ${event.title}")
-                }
+//                if (eventAdded) {
+//                    showToast("Event added successfully: ${event.title}")
+//                } else {
+//                    showToast("Failed to add event: ${event.title}")
+//                }
             }
+
+
+            val accounts = AccountManager.get(context).getAccountsByType("com.google")
+
+            val inputEditText = EditText(context)
+            val alertDialog = AlertDialog.Builder(context)
+                .setTitle("Enter Google Calendar Email")
+                .setView(inputEditText)
+                .setCancelable(false)
+                .setPositiveButton("OK") { _, _ ->
+                    val userInput = inputEditText.text.toString()
+
+                    if (userInput.isBlank()) {
+                        inputEditText.error = ""
+                        val alertDialog = AlertDialog.Builder(context)
+                            .setTitle("Email can not be Empty!")
+                            .setPositiveButton("OK") { _, _ ->
+                            }.create()
+                        alertDialog.show()
+                    }
+                    else if(!userInput.endsWith("@gmail.com")){
+                        val alertDialog = AlertDialog.Builder(context)
+                            .setTitle("Not a valid Email")
+                            .setPositiveButton("OK") { _, _ ->
+                            }.create()
+                        alertDialog.show()
+                    }
+                    else {
+                        for (account in accounts) {
+                            Log.d("email123", account.name.toString())
+                            if (account.name == userInput) {
+                                val authority =
+                                    "com.android.calendar" // Calendar Provider authority
+                                val extras = Bundle()
+                                extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true)
+                                extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true)
+                                ContentResolver.requestSync(account, authority, extras)
+                                ContentResolver.requestSync(account, authority, extras)
+                                ContentResolver.requestSync(account, authority, extras)
+                                ContentResolver.requestSync(account, authority, extras)
+                                val pd = ProgressDialog(context)
+                                pd.setTitle("Adding Events")
+                                pd.setMessage("Adding Events if not added then check Google Calendar App after 4 to 5 Minutes")
+                                pd.show()
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    pd.dismiss()
+                                    showToast("Event added successfully")
+                                }, 3000)
+                                break
+                            } else {
+                                val alertDialog = AlertDialog.Builder(context)
+                                    .setTitle("Email not exist")
+                                    .setPositiveButton("OK") { _, _ ->
+                                    }.create()
+                                alertDialog.show()
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.cancel()
+                }
+                .create()
+
+            alertDialog.show()
+
+
+
+
+
 
 
             return results
